@@ -1,0 +1,80 @@
+from cryptography.fernet import Fernet
+import base64
+import os
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+
+
+
+#PassHash by $auce
+'''
+                \ __
+--==/////////////[})))==*
+                 / \ '          ,|
+                    `\`\      //|                             ,|
+                      \ `\  //,/'                           -~ |
+   )             _-~~~\  |/ / |'|                       _-~  / ,
+  ((            /' )   | \ / /'/                    _-~   _/_-~|
+ (((            ;  /`  ' )/ /''                 _ -~     _-~ ,/'
+ ) ))           `~~\   `\\/'/|'           __--~~__--\ _-~  _/, 
+((( ))            / ~~    \ /~      __--~~  --~~  __/~  _-~ /
+ ((\~\           |    )   | '      /        __--~~  \-~~ _-~
+    `\(\    __--(   _/    |'\     /     --~~   __--~' _-~ ~|
+     (  ((~~   __-~        \~\   /     ___---~~  ~~\~~__--~ 
+      ~~\~~~~~~   `\-~      \~\ /           __--~~~'~~/
+                   ;\ __.-~  ~-/      ~~~~~__\__---~~ _..--._
+                   ;;;;;;;;'  /      ---~~~/_.-----.-~  _.._ ~\     
+                  ;;;;;;;'   /      ----~~/         `\,~    `\ \        
+                  ;;;;'     (      ---~~/         `:::|       `\\.      
+                  |'  _      `----~~~~'      /      `:|        ()))),      
+            ______/\/~    |                 /        /         (((((())  
+          /~;;.____/;;'  /          ___.---(   `;;;/             )))'`))
+         / //  _;______;'------~~~~~    |;;/\    /                ((   ( 
+        //  \ \                        /  |  \;;,\                 `   
+       (<_    \ \                    /',/-----'  _> 
+        \_|     \\_                 //~;~~~~~~~~~ 
+                 \_|               (,~~  
+                                    \~\
+                                     ~~
+'''
+global passlist #makes passlist global variable
+passlist = [] #empty list
+
+# encrypt
+def encrypt():
+    print("This is the hashing page")
+    # Hash & Salt
+    password = input("Password: ")
+    salt = os.urandom(16)
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=480000,
+    )
+    # Create Key
+    key = base64.urlsafe_b64encode(kdf.derive(password.encode('utf8')))
+    f = Fernet(key)
+    token = f.encrypt(password.encode('utf8'))
+    passlist.append(token) #adds hash to password list
+    save = open("Hashed Passwords", "w+") #creates txt doc
+    save.write(str(passlist)) #saves hash to txt doc
+    save.close() #closes doc
+    print("Success!")
+    print("The Hash is: " + str(token, "utf8"))
+    check() #calls the check function after submitting query
+
+#Check if user wants to hash more passwords
+def check():
+   Checkem = input("Would you like to hash more passwords? Y/N: ")
+
+   if Checkem == "y":
+       print("Lesgo! Enter another password to hash below!")
+       encrypt()
+
+   if Checkem == "n":
+       print("Thanks for using PassHash by $auce! :) Happy Holidays.")
+       quit()
+
+
+encrypt() #calls function to start the program upon launch
